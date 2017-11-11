@@ -1,0 +1,443 @@
+Line number: 1
+Keywords in line: 
+Lexemes in line: 
+"scl.h"						STRING_LITERAL
+------------------------------------
+Line number: 2
+Keywords in line: 
+Lexemes in line: 
+"basic_lib.h"						STRING_LITERAL
+------------------------------------
+Line number: 3
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 4
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 5
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 6
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 7
+Keywords in line: 
+symbol						5002
+Lexemes in line: 
+45						INTEGER_LITERAL
+------------------------------------
+Line number: 8
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 9
+Keywords in line: 
+forward						5003
+declarations						7003
+Lexemes in line: 
+------------------------------------
+Line number: 10
+Keywords in line: 
+function						5005
+integer						6001
+type						5008
+return						7019
+Lexemes in line: 
+------------------------------------
+Line number: 11
+Keywords in line: 
+parameters						7006
+Lexemes in line: 
+------------------------------------
+Line number: 12
+Keywords in line: 
+array						5007
+type						5008
+Lexemes in line: 
+------------------------------------
+Line number: 13
+Keywords in line: 
+integer						6001
+type						5008
+Lexemes in line: 
+------------------------------------
+Line number: 14
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 15
+Keywords in line: 
+global						7002
+declarations						7003
+Lexemes in line: 
+------------------------------------
+Line number: 16
+Keywords in line: 
+constants						7007
+Lexemes in line: 
+------------------------------------
+Line number: 17
+Keywords in line: 
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+MAX						CONSTANT_INTEGER_IDENTIFIER
+50						INTEGER_LITERAL
+------------------------------------
+Line number: 18
+Keywords in line: 
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+ARRAY_SIZE						CONSTANT_INTEGER_IDENTIFIER
+100						INTEGER_LITERAL
+------------------------------------
+Line number: 19
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 20
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+array[MM]						5007
+Lexemes in line: 
+varm2						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 21
+Keywords in line: 
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+var3						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 22
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 23
+Keywords in line: 
+array						5007
+Lexemes in line: 
+------------------------------------
+Line number: 24
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 25
+Keywords in line: 
+implementations						7004
+Lexemes in line: 
+------------------------------------
+Line number: 26
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 27
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 28
+Keywords in line: 
+function						5005
+of						7021
+main						7005
+Lexemes in line: 
+------------------------------------
+Line number: 29
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 30
+Keywords in line: 
+function						5005
+main						7005
+Lexemes in line: 
+------------------------------------
+Line number: 31
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 32
+Keywords in line: 
+array						5007
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+[MAX]						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 33
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+max_val						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 34
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+kelements						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 35
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+j						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 36
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+mybhvar						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 37
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+myihvar						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 38
+Keywords in line: 
+begin						7008
+Lexemes in line: 
+------------------------------------
+Line number: 39
+Keywords in line: 
+of						7021
+Lexemes in line: 
+"Number of elements to process: "						STRING_LITERAL
+------------------------------------
+Line number: 40
+Keywords in line: 
+Lexemes in line: 
+0						INTEGER_LITERAL
+------------------------------------
+Line number: 41
+Keywords in line: 
+Lexemes in line: 
+"Enter element int value: "						STRING_LITERAL
+------------------------------------
+Line number: 42
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 43
+Keywords in line: 
+set						7018
+Lexemes in line: 
+------------------------------------
+Line number: 44
+Keywords in line: 
+display						7017
+Lexemes in line: 
+"Max Integer found: "						STRING_LITERAL
+------------------------------------
+Line number: 45
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 46
+Keywords in line: 
+endfun						7009
+main						7005
+Lexemes in line: 
+------------------------------------
+Line number: 47
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 48
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 49
+Keywords in line: 
+function						5005
+Lexemes in line: 
+------------------------------------
+Line number: 50
+Keywords in line: 
+integer						6001
+Lexemes in line: 
+------------------------------------
+Line number: 51
+Keywords in line: 
+array						5007
+of						7021
+integer						6001
+Lexemes in line: 
+------------------------------------
+Line number: 52
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 53
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 54
+Keywords in line: 
+function						5005
+integer						6001
+type						5008
+return						7019
+Lexemes in line: 
+------------------------------------
+Line number: 55
+Keywords in line: 
+parameters						7006
+Lexemes in line: 
+------------------------------------
+Line number: 56
+Keywords in line: 
+array[]						5007
+of						7021
+type						5008
+Lexemes in line: 
+------------------------------------
+Line number: 57
+Keywords in line: 
+of						7021
+integer						6001
+type						5008
+Lexemes in line: 
+------------------------------------
+Line number: 58
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 59
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 60
+Keywords in line: 
+array						5007
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+i						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 61
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+max_elem						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 62
+Keywords in line: 
+of						7021
+define						7020
+integer						6001
+type						5008
+Lexemes in line: 
+hh						INTEGER_IDENTIFIER
+------------------------------------
+Line number: 63
+Keywords in line: 
+begin						7008
+Lexemes in line: 
+------------------------------------
+Line number: 64
+Keywords in line: 
+set						7018
+Lexemes in line: 
+1						INTEGER_LITERAL
+------------------------------------
+Line number: 65
+Keywords in line: 
+set						7018
+Lexemes in line: 
+------------------------------------
+Line number: 66
+Keywords in line: 
+display						7017
+Lexemes in line: 
+"initial max_elem: "						STRING_LITERAL
+------------------------------------
+Line number: 67
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 68
+Keywords in line: 
+if						7010
+Lexemes in line: 
+------------------------------------
+Line number: 69
+Keywords in line: 
+then						7011
+Lexemes in line: 
+------------------------------------
+Line number: 70
+Keywords in line: 
+set						7018
+Lexemes in line: 
+------------------------------------
+Line number: 71
+Keywords in line: 
+set						7018
+Lexemes in line: 
+------------------------------------
+Line number: 72
+Keywords in line: 
+display						7017
+Lexemes in line: 
+"max_elem: "						STRING_LITERAL
+------------------------------------
+Line number: 73
+Keywords in line: 
+endif						7013
+Lexemes in line: 
+------------------------------------
+Line number: 74
+Keywords in line: 
+set						7018
+Lexemes in line: 
+1						INTEGER_LITERAL
+------------------------------------
+Line number: 75
+Keywords in line: 
+Lexemes in line: 
+------------------------------------
+Line number: 76
+Keywords in line: 
+return						7019
+Lexemes in line: 
+------------------------------------
+Line number: 77
+Keywords in line: 
+endfun						7009
+Lexemes in line: 
+------------------------------------
