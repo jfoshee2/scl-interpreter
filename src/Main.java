@@ -1,6 +1,6 @@
-import interpreter.SCLScanner;
-import interpreter.SCLSourceLine;
-import interpreter.Token;
+import scanner.SCLScanner;
+import scanner.SCLSourceLine;
+import scanner.Token;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ import java.util.Map;
  * CS 4308 Concepts of Programming Languages
  * 30 September 2017
  *
- * This program tests the interpreter.SCLScanner class and gives a sample output.
+ * This program tests the scanner.SCLScanner class and gives a sample output.
  */
 
 public class Main {

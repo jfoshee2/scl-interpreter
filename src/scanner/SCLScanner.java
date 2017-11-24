@@ -1,6 +1,4 @@
-package interpreter;
-
-import interpreter.Keyword;
+package scanner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +15,7 @@ public class SCLScanner {
     private File sclProgram;
 
     /**
-     * Creates instance of interpreter.SCLScanner
+     * Creates instance of scanner.SCLScanner
      *
      * @param sclProgram - the SCL file to be read.
      * @throws FileNotFoundException if the SCL file does not exist
@@ -25,34 +23,6 @@ public class SCLScanner {
     public SCLScanner(File sclProgram) throws FileNotFoundException {
         this.sclProgram = sclProgram;
         input = new Scanner(sclProgram);
-    }
-
-    /**
-     * Method to get a hash map of keywords and their number codes
-     *
-     * @return a hash map of SCL keywords and their corresponding number codes
-     */
-    public HashMap<String, Integer> getKeywords() throws FileNotFoundException {
-        HashMap<String, Integer> keywords = new HashMap<>();
-
-        while (input.hasNext()) {
-            String line = input.nextLine();
-            String[] parts = line.split(" ");
-
-            for (String part : parts) {
-
-                // if it is a reserved word
-                if (Keyword.getNumCode(part) > 0) {
-                    keywords.put(part, Keyword.getNumCode(part));
-                }
-
-
-            }
-        }
-
-        input = new Scanner(sclProgram); // Reset Scanner to top of file
-
-        return keywords;
     }
 
     public ArrayList<SCLSourceLine> getSourceLines() throws FileNotFoundException {
@@ -78,7 +48,7 @@ public class SCLScanner {
             // boolean variable for whether or not a source line is going to define a variable
             boolean isDefined = false;
 
-            // TODO: Add constants and variables to interpreter.Keyword enum
+            // TODO: Add constants and variables to scanner.Keyword enum
             if (line.contains("constants")) {
                 canModify = false;
             } else if (line.contains("variables")) {
@@ -86,6 +56,7 @@ public class SCLScanner {
             }
 
             String variable = "";       // variable to possibly be assigned
+            boolean isSymbol = false;   // check to see if there is a symbol
 
             for (String part : parts) {
 
@@ -99,7 +70,7 @@ public class SCLScanner {
                 }
 
                 // if it is not a reserved word or a token.
-                if (Keyword.getNumCode(part) <= 0 && isDefined && Token.getNumCode(part) < 0) {
+                if (Keyword.getNumCode(part) <= 0 && isDefined && Token.getNumCode(part) < 0 || isSymbol) {
                     variable = part;
                 }
 
@@ -108,11 +79,15 @@ public class SCLScanner {
                         Keyword.getNumCode(part) == Keyword.STRING.getNumCode() ||
                         Keyword.getNumCode(part) == Keyword.BOOLEAN.getNumCode();
 
+                if (Keyword.getKeyword(part) == Keyword.SYMBOL)
+                    isSymbol = true;
 
-                /*    if a variables is about be defined
-                *     it is not a bland string
-                *     it is not a key word
-                */
+
+                /*
+                if a variables is about be defined
+                it is not a blank string
+                it is not a key word
+                 */
                 if (isDefined && !variable.equals("") && isDataType) { // check for data types
 
                     if (canModify) {
@@ -148,6 +123,9 @@ public class SCLScanner {
                     }
 
                     isDefined = false; // set it back to false so it doesn't keep on assigning.
+                } else if (isSymbol && !variable.equals("")) {
+                    System.out.println("debug");
+                    lexemes.put(variable, Token.SYMBOL_IDENTIFIER);
                 }
 
                 // if it is a number
@@ -156,7 +134,7 @@ public class SCLScanner {
                 }
             }
 
-            sourceLines.add(new SCLSourceLine(lineCount, keywords, lexemes));
+            sourceLines.add(new SCLSourceLine(lineCount, keywords, lexemes, line));
 
             ++lineCount;
 

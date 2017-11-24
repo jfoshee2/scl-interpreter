@@ -1,4 +1,4 @@
-package interpreter;
+package scanner;
 
 /**
  * Created by James on 9/1/2017.
@@ -98,6 +98,15 @@ public enum Keyword {
             }
         }
         return -1;
+    }
+
+    public static Keyword getKeyword(String target) {
+        for (Keyword word : Keyword.values()) {
+            if (target.matches(word.getValue())) {
+                return word;
+            }
+        }
+        return null;
     }
 
 }

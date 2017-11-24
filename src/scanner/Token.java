@@ -1,4 +1,4 @@
-package interpreter;
+package scanner;
 
 /**
  * Created by James on 8/30/2017.
@@ -57,7 +57,12 @@ public enum Token {
 
     MUL_OPERATOR("\\*", 23),
 
-    DIV_OPERATOR("/", 24);
+    DIV_OPERATOR("/", 24),
+
+    /* Symbol Identifier*/
+    SYMBOL_IDENTIFIER("", 25),
+
+    FUNCTION_IDENTIFIER("", 26);
 
 
     private String val;

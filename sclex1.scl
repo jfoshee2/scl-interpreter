@@ -14,8 +14,8 @@ function max_array return type integer
 
 global declarations
 constants
-   define MAX = 50  type integer
-   define ARRAY_SIZE  100 type integer
+   define MAX = 50 type integer
+   define ARRAY_SIZE = 100 type integer
 variables
    define varm2 array[MM] of type integer
    define var3  type integer   

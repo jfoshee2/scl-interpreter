@@ -28,6 +28,7 @@ Line number: 7
 Keywords in line: 
 symbol						5002
 Lexemes in line: 
+MM						SYMBOL_IDENTIFIER
 45						INTEGER_LITERAL
 ------------------------------------
 Line number: 8
