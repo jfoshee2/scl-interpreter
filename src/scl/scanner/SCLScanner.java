@@ -109,7 +109,7 @@ public class SCLScanner {
                 }
 
                 // if it is not a token
-                if (token == null && (define || symbol)) {
+                if (token == Token.NOT_DEFINED && (define || symbol)) {
                     variable = part; // assign part to variable because it is probably an identifier
                 }
 
@@ -168,9 +168,9 @@ public class SCLScanner {
                     symbol = false; // hack way of doing this but this makes sure that the variable is not added twice
                 }
 
-                if (!addedToLexemes && token != null) {
-                    lexemes.add(new Lexeme(token, part));
-                }
+//                if (!addedToLexemes && token != null) {
+//                    lexemes.add(new Lexeme(token, part));
+//                }
             }
 
             SCLSourceLine sclSourceLine = new SCLSourceLine(lineNumber++, lexemes, rawLine);

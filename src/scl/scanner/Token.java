@@ -64,6 +64,10 @@ public enum Token {
 
     FUNCTION_IDENTIFIER("", 26),
 
+    LB("\\[", 27),
+
+    RB("\\]", 28),
+
     /** Keywords **/
     SPECIFICATIONS("specifications", 5001),
 
@@ -87,6 +91,8 @@ public enum Token {
 
     INPUT("input", 5011),
 
+    SYMBOLS("symbols", 5012),
+
     /* Data types */
 
     INTEGER("integer", 6001),
@@ -96,6 +102,10 @@ public enum Token {
     STRING("string", 6003),
 
     BOOLEAN("boolean", 6004),
+
+    SHORT("short", 6005),
+
+    MVOID("mvoid", 6006),
 
     ENUM("enum", 7001),
 

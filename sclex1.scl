@@ -18,7 +18,7 @@ constants
    define ARRAY_SIZE = 100 type integer
 variables
    define varm2 array[MM] of type integer
-   define var3  type integer   
+   define var3 of type integer
 /*
   This program computes the maximum value in an array
 */

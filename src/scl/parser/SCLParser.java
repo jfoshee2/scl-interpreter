@@ -33,7 +33,7 @@ public class SCLParser extends SCLScanner {
         nextToken = null;
     }
 
-    public SCLTree parse() { // TODO: Make this return a parse tree
+    public SCLTree parse() { // TODO: Make this return a parse tree when implementing interpreter
         sclSourceLines = super.getSourceLines();
 
         Lexeme nextLexeme = getNextLexeme();
@@ -42,6 +42,7 @@ public class SCLParser extends SCLScanner {
         while (lineIndex < sclSourceLines.size()) { // while there is still stuff to parse
             switch (nextToken) {
                 case IMPORT: importDef(); break;
+                case SYMBOLS: symbol(); break;
                 case SYMBOL: symbolDef(); break;
                 case FORWARD: forwardRefs(); break;
                 case SPECIFICATIONS: specifications(); break;
@@ -74,7 +75,14 @@ public class SCLParser extends SCLScanner {
      ;
      */
     private void symbol() {
-        // TODO: function may not be needed.
+
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken == Token.SYMBOL) {
+            symbolDef();
+            symbol(); // Parse next symbol
+        }
+
     }
 
     /**
@@ -127,6 +135,8 @@ public class SCLParser extends SCLScanner {
      */
     private void frefs() {
 
+        // TODO: may not be needed.
+
     }
 
     /**
@@ -138,14 +148,7 @@ public class SCLParser extends SCLScanner {
 
         nextToken = getNextLexeme().getToken();
 
-        if (nextToken == Token.FUNCTION) {
-
-            nextToken = getNextLexeme().getToken();
-
-            funcMain();
-            parameters();
-            forwardList();
-        }
+        forwards();
 
     }
 
@@ -155,7 +158,14 @@ public class SCLParser extends SCLScanner {
      ;
      */
     private void forwards() {
-        // TODO: function may not be needed
+        if (nextToken == Token.FUNCTION) {
+
+            nextToken = getNextLexeme().getToken();
+
+            funcMain();
+            parameters();
+            forwardList();
+        }
     }
 
     /**
@@ -215,7 +225,7 @@ public class SCLParser extends SCLScanner {
      */
     private void chkPtr() {
 
-        // TODO: Implement
+        // TODO: Implement, but may not be needed
 
     }
 
@@ -226,7 +236,10 @@ public class SCLParser extends SCLScanner {
      */
     private void chkArray() {
 
-        // TODO: Implement
+        if (nextToken == Token.ARRAY) {
+            nextToken = getNextLexeme().getToken();
+            arrayDimList();
+        }
 
     }
 
@@ -237,7 +250,15 @@ public class SCLParser extends SCLScanner {
      */
     private void arrayDimList() {
 
-        // TODO: Implement
+        if (nextToken != Token.LB) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        arrayIndex();
+
+        if (nextToken != Token.RB) {
+            System.out.println("Error at line: " + lineIndex);
+        }
 
     }
 
@@ -253,6 +274,8 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         }
 
+        nextToken = getNextLexeme().getToken();
+
     }
 
     /**
@@ -265,7 +288,7 @@ public class SCLParser extends SCLScanner {
 
         nextToken = getNextLexeme().getToken();
 
-        if (nextToken == Token.TYPE) { // ARRAy
+        if (nextToken == Token.TYPE) { // ARRAY
 
             nextToken = getNextLexeme().getToken();
 
@@ -290,8 +313,11 @@ public class SCLParser extends SCLScanner {
      */
     private void typeName() {
 
-        // TODO: this may not be needed
+        if (nextToken != Token.MVOID && nextToken != Token.INTEGER && nextToken != Token.SHORT) {
+            System.out.println("Error at line: " + lineIndex);
+        }
 
+        nextToken = getNextLexeme().getToken();
     }
 
     /**
@@ -301,8 +327,11 @@ public class SCLParser extends SCLScanner {
      */
     private void specifications() {
 
-        // TODO: Implement
+        System.out.println("<specifications>");
 
+        specList();
+
+        System.out.println("</specifications>");
     }
 
     /**
@@ -312,7 +341,8 @@ public class SCLParser extends SCLScanner {
      */
     private void specList() {
 
-        // TODO: Implement
+        nextToken = getNextLexeme().getToken();
+        specDef();
 
     }
 
@@ -323,7 +353,9 @@ public class SCLParser extends SCLScanner {
      */
     private void specDef() {
 
-        // TODO: Implement
+        if (nextToken != Token.ENUM && nextToken != Token.STRUCT) {
+            System.out.println("Error at line:" + lineIndex);
+        }
 
     }
 
@@ -735,6 +767,18 @@ public class SCLParser extends SCLScanner {
      */
     private void repeatStatement() {
 
+        if (nextToken != Token.REPEAT) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        nextToken = getNextLexeme().getToken();
+
+
+        // TODO: Double check this.
+        while (nextToken != Token.END_REPEAT) {
+            statementList();
+        }
+
     }
 
     /**
@@ -765,7 +809,23 @@ public class SCLParser extends SCLScanner {
      */
     private void args() {
 
-        // TODO: Finish implementation
+        // TODO: Possibly create a separate function for this to reduce redundancy
+        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
+                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.CONSTANT_INTEGER_IDENTIFIER && nextToken != Token.CONSTANT_FLOAT_IDENTIFIER
+                && nextToken != Token.CONSTANT_STRING_IDENTIFIER && nextToken != Token.CONSTANT_BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.INTEGER_LITERAL && nextToken != Token.FLOAT_LITERAL
+                && nextToken != Token.STRING_LITERAL) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+
 
     }
 
@@ -802,7 +862,7 @@ public class SCLParser extends SCLScanner {
      */
     private void arithmenticExp() {
 
-        // TODO: Finish implementation
+        // TODO: Finish implementation, but may not be needed
 
     }
 
@@ -814,7 +874,7 @@ public class SCLParser extends SCLScanner {
      */
     private void mulexp() {
 
-        // TODO: Finish implementation
+        // TODO: Finish implementation, but may not be needed
 
     }
 
@@ -826,6 +886,8 @@ public class SCLParser extends SCLScanner {
      ;
      */
     private void primary() {
+
+        // TODO: Finish implementation, but may not be needed
 
     }
 
