@@ -37,6 +37,7 @@ public class SCLScanner {
 
         int lineNumber = 1;
         boolean canModify = true;   // switch for whether or not variables can be modified
+        boolean ignore = false;     // switch for whether a line can be ignored, used for block comments and description
         while (input.hasNext()) {
 
             List<Lexeme> lexemes = new ArrayList<>(); // List of tokens found in each line
@@ -44,6 +45,16 @@ public class SCLScanner {
             String line = input.nextLine();
 
             String rawLine = line;
+
+            if (line.contains("description")) {
+                ignore = true;
+            } else if (line.contains("*/")) {
+                ignore = false;
+            }
+
+            if (ignore) {
+                break;
+            }
 
             // if it's a comment ignore it.
             if (line.contains("//")) {
@@ -67,6 +78,7 @@ public class SCLScanner {
             String variable = "";       // variable that will possibly be assigned
             boolean define = false;     // tells if a variable is about to be defined
             boolean symbol = false;     // tells whether there is a symbol on the current line
+            boolean array = false;      // tells if a variable is an array
 
             // Add tokens to tokens list
             for (String part : parts) {
@@ -108,6 +120,10 @@ public class SCLScanner {
                     define = true;
                 }
 
+                if (token == Token.ARRAY) {
+                    array = true;
+                }
+
                 // if it is not a token
                 if (token == Token.NOT_DEFINED && (define || symbol)) {
                     variable = part; // assign part to variable because it is probably an identifier
@@ -123,7 +139,26 @@ public class SCLScanner {
                  */
 
                 if (!variable.equals("") && define && dataType) {
-                    if (canModify) {
+                    if (array) {
+                        switch (token) {
+                            case INTEGER:
+                                lexemes.add(new Lexeme(Token.ARRAY_INTEGER_IDENTIFIER, variable));
+                                addedToLexemes = true;
+                                break;
+                            case FLOAT:
+                                lexemes.add(new Lexeme(Token.ARRAY_FLOAT_IDENTIFIER, variable));
+                                addedToLexemes = true;
+                                break;
+                            case STRING:
+                                lexemes.add(new Lexeme(Token.ARRAY_STRING_IDENTIFIER, variable));
+                                addedToLexemes = true;
+                                break;
+                            case BOOLEAN:
+                                lexemes.add(new Lexeme(Token.ARRAY_BOOLEAN_IDENTIFIER, variable));
+                                addedToLexemes = true;
+                                break;
+                        }
+                    } else if (canModify) {
                         switch (token) {
                             case INTEGER:
                                 lexemes.add(new Lexeme(Token.INTEGER_IDENTIFIER, variable));
@@ -168,9 +203,9 @@ public class SCLScanner {
                     symbol = false; // hack way of doing this but this makes sure that the variable is not added twice
                 }
 
-//                if (!addedToLexemes && token != null) {
-//                    lexemes.add(new Lexeme(token, part));
-//                }
+                if (!addedToLexemes && token != Token.NOT_DEFINED) {
+                    lexemes.add(new Lexeme(token, part));
+                }
             }
 
             SCLSourceLine sclSourceLine = new SCLSourceLine(lineNumber++, lexemes, rawLine);

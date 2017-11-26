@@ -68,6 +68,16 @@ public enum Token {
 
     RB("\\]", 28),
 
+    /* Array identifiers */
+
+    ARRAY_INTEGER_IDENTIFIER("", 10),
+
+    ARRAY_FLOAT_IDENTIFIER("", 11),
+
+    ARRAY_STRING_IDENTIFIER("", 12),
+
+    ARRAY_BOOLEAN_IDENTIFIER("", 13),
+
     /** Keywords **/
     SPECIFICATIONS("specifications", 5001),
 

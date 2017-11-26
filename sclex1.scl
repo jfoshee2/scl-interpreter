@@ -51,7 +51,7 @@ variables
          are used: the integer array and the current number of 
          elements in the array.
    */
-  function  max_array return type integer
+  function max_array return type integer
    parameters 
        a array[] of type integer,
        num_elements of type integer
