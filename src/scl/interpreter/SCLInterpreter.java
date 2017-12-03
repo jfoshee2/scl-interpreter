@@ -6,18 +6,25 @@ import scl.parser.SCLTreeNode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 /**
  * Created by James on 11/26/2017.
  */
 public class SCLInterpreter extends SCLParser {
 
+    private HashMap<String, Object> globalVariables; // Used for storing the global variables within the program
+
     public SCLInterpreter(File sclProgram) throws FileNotFoundException {
         super(sclProgram);
+        globalVariables = new HashMap<>();
     }
 
     public void interpret() {
         SCLTree parseTree = super.parse();
+
+        SCLTreeNode rootNode = parseTree.getRoot();
+
 
         System.out.println(displayMyTree(parseTree.getRoot(), 0));
 
@@ -25,6 +32,11 @@ public class SCLInterpreter extends SCLParser {
 
 
     }
+
+    private void interpret(SCLTreeNode sclTreeNode, SCLTreeNode parent) {
+
+    }
+
 
     /**
      * Builds a String starting from root node

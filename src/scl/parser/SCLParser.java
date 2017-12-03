@@ -854,6 +854,7 @@ public class SCLParser extends SCLScanner {
 
         SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
         sclTreeNode.addChild(sclTreeNodeChild);
+        nextToken = getNextLexeme().getToken();
 
         // while there is no end fun keep parsing
         while (nextToken != Token.END_FUN) {
@@ -894,7 +895,7 @@ public class SCLParser extends SCLScanner {
 
         System.out.println("Parsing statement");
 
-        nextToken = getNextLexeme().getToken();
+//        nextToken = getNextLexeme().getToken();
 
         if (nextToken == Token.INPUT) {
             inputStatement(sclTreeNode);
@@ -954,34 +955,21 @@ public class SCLParser extends SCLScanner {
     }
 
     private void displayStatement(SCLTreeNode sclTreeNode) {
-        nextToken = getNextLexeme().getToken();
-
-//        if (nextToken != Token.STRING_LITERAL) {
-//            System.out.println("Error on line: " + lineIndex);
-//            System.out.println("No Prompt for input");
-//        }
-//
 //        nextToken = getNextLexeme().getToken();
-//
-//        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.ARRAY_INTEGER_IDENTIFIER
-//                && nextToken != Token.IDENTIFIER) {
-//            System.out.println("Error on line: " + lineIndex);
-//            System.out.println("No argument to store input");
-//        }
 
-        int tempLineIndex = lineIndex;
-
-        while (tempLineIndex == lineIndex) { // while the line hasn't changed
-            switch (nextToken) {
-                case STRING_LITERAL: nextToken = getNextLexeme().getToken(); break;
-                case IDENTIFIER: nextToken = getNextLexeme().getToken(); break;
-                default:
-                    System.out.println("Error at line: " + lineIndex);
-                    System.out.println("Invalid Display statement");
-            }
+        if (nextToken != Token.STRING_LITERAL) {
+            System.out.println("Error on line: " + lineIndex);
+            System.out.println("No Prompt for input");
         }
 
-        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(tempLineIndex)));
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken != Token.IDENTIFIER) {
+            System.out.println("Error on line: " + lineIndex);
+            System.out.println("No argument to store input");
+        }
+
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
 
         nextToken = getNextLexeme().getToken();
     }
