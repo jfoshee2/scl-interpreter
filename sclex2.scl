@@ -1,0 +1,31 @@
+symbol MM 45
+
+global declarations
+constants
+    define PI = 3.14159265 type float
+variables
+    define radius of type integer
+
+
+implementations
+
+function main is
+    variables
+        define diameter of type integer
+        define area of type float
+        define circumference of type float
+
+    begin
+        input "Enter the diameter of the circle: ", diameter
+
+        set radius = diameter / 2
+        set area = PI * radius * radius
+        set circumference = 2 * PI * radius
+
+        display "Area: ", area
+        display "Circumference: ", circumference
+        exit
+    endfun main
+
+
+

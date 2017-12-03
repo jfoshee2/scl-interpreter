@@ -1,0 +1,48 @@
+Parsing import
+Finished Parsing import
+Parsing symbol
+Finished Parsing symbol
+Parsing forward_refs
+Parsing forward_list
+Parsing forwards
+Finished parsing forwards
+Finished parsing forward_list
+Finished Parsing forward_refs
+Parsing globals
+Parsing declarations
+Parsing const_dec
+Parsing const_list
+Parsing const_list
+Finished Parsing const_list
+Finished Parsing const_list
+Finished Parsing const_dec
+Parsing var_dec
+Parsing var_list
+Parsing ret_type
+Finished Parsing ret_type
+Finished Parsing var_list
+Finished Parsing var_dec
+Finished Parsing declarations
+Finished Parsing globals
+Parsing implement
+Parsing funct_list
+Parsing funct_def
+Parsing funct_body
+Parsing parameters
+Error at line: 30
+Finished Parsing parameters
+Parsing main_head
+Error at line: 30
+Finished Parsing main_head
+Parsing f_body
+Error at line: 30
+Parsing statement_list
+Parsing statement
+Finished Parsing statement
+Finished Parsing statement_list
+Error at line: 30
+Finished Parsing f_body
+Finished Parsing funct_body
+Finished Parsing funct_def
+Finished Parsing funct_list
+Finished Parsing implement

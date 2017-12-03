@@ -10,7 +10,7 @@ forward declarations
 function max_array return type integer 
  parameters 
        a array [] type integer, 
-       num_elements  type integer
+       num_elements type integer
 
 global declarations
 constants
@@ -53,8 +53,8 @@ variables
    */
   function max_array return type integer
    parameters 
-       a array[] of type integer,
-       num_elements of type integer
+       a array [] type integer,
+       num_elements type integer
    is
    variables                      // local variables
        define i of type integer   // used as index of the array

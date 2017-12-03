@@ -1,4 +1,6 @@
-package scl.scanner;
+import scl.scanner.Lexeme;
+import scl.scanner.SCLScanner;
+import scl.scanner.SCLSourceLine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,14 +8,19 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by James on 11/16/2017.
+ * Nathan Foshee
+ * Prof Vaidya
+ * CS 4308 Concepts of Programming Languages
+ * 30 September 2017
+ *
+ * This program tests the scl.scanner.SCLScanner class and gives a sample output.
  */
 public class TestScanner {
     public static void main(String[] args) {
 
         SCLScanner sclScanner = null;
         try {
-            sclScanner = new SCLScanner(new File("sclex1.scl"));
+            sclScanner = new SCLScanner(new File("sclex2.scl"));
             List<SCLSourceLine> sclSourceLines = sclScanner.getSourceLines();
 
             System.out.println("Lexemes found");

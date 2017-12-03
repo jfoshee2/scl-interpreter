@@ -33,34 +33,36 @@ public class SCLParser extends SCLScanner {
         nextToken = null;
     }
 
-    public SCLTree parse() { // TODO: Make this return a parse tree when implementing interpreter
+    public SCLTree parse() {
         sclSourceLines = super.getSourceLines();
+
+        SCLTreeNode rootNode = new SCLTreeNode("ROOT");
 
         Lexeme nextLexeme = getNextLexeme();
         nextToken = nextLexeme.getToken();
 
         while (lineIndex < sclSourceLines.size()) { // while there is still stuff to parse
             switch (nextToken) {
-                case IMPORT: importDef(); break;
-                case SYMBOLS: symbol(); break;
-                case SYMBOL: symbolDef(); break;
-                case FORWARD: forwardRefs(); break;
+                case IMPORT: importDef(rootNode); break;
+                case SYMBOLS: symbol(rootNode); break;
+                case SYMBOL: symbolDef(rootNode); break;
+                case FORWARD: forwardRefs(rootNode); break;
                 case SPECIFICATIONS: specifications(); break;
-                case GLOBAL: globals(); break;
-                case IMPLEMENTATIONS: implement(); break;
+                case GLOBAL: globals(rootNode); break;
+                case IMPLEMENTATIONS: implement(rootNode); break;
                 default:
                     nextToken = getNextLexeme().getToken();
             }
         }
 
 
-        return null;
+        return new SCLTree(rootNode);
     }
 
     /**
      * import: IMPORT STRING_LITERAL;
      */
-    private void importDef() {
+    private void importDef(SCLTreeNode sclTreeNode) {
         System.out.println("Parsing import");
 
         // check to see if next token is a string literal
@@ -68,6 +70,7 @@ public class SCLParser extends SCLScanner {
         if (nextToken != Token.STRING_LITERAL) {
             System.out.println("Error at line number: " + lineIndex);
         }
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex))); // Add line as a child node
         nextToken = getNextLexeme().getToken();
 
         System.out.println("Finished Parsing import");
@@ -78,15 +81,15 @@ public class SCLParser extends SCLScanner {
      | symbols symbol_def
      ;
      */
-    private void symbol() {
+    private void symbol(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing symbols");
 
         nextToken = getNextLexeme().getToken();
 
         if (nextToken == Token.SYMBOL) {
-            symbolDef();
-            symbol(); // Parse next symbol
+            symbolDef(sclTreeNode);
+            symbol(sclTreeNode); // Parse next symbol
         }
 
         System.out.println("Finished Parsing symbols");
@@ -97,7 +100,7 @@ public class SCLParser extends SCLScanner {
      * symbol_def : SYMBOL IDENTIFIER HCON
      ;
      */
-    private void symbolDef() {
+    private void symbolDef(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing symbol");
 
@@ -115,6 +118,8 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         }
 
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
+
         System.out.println("Finished Parsing symbol");
 
     }
@@ -124,7 +129,7 @@ public class SCLParser extends SCLScanner {
      | FORWARD frefs
      ;
      */
-    private void forwardRefs() {
+    private void forwardRefs(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing forward_refs");
 
@@ -136,9 +141,11 @@ public class SCLParser extends SCLScanner {
             return;
         }
 
+        SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
         nextToken = getNextLexeme().getToken();
+        sclTreeNode.addChild(sclTreeNodeChild);
 
-        forwardList();
+        forwardList(sclTreeNodeChild); // TODO: double check this.
 
         System.out.println("Finished Parsing forward_refs");
 
@@ -160,13 +167,13 @@ public class SCLParser extends SCLScanner {
      | forward_list forwards
      ;
      */
-    private void forwardList() {
+    private void forwardList(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing forward_list");
 
-        nextToken = getNextLexeme().getToken();
+//        nextToken = getNextLexeme().getToken();
 
-        forwards();
+        forwards(sclTreeNode);
 
         System.out.println("Finished parsing forward_list");
 
@@ -177,16 +184,18 @@ public class SCLParser extends SCLScanner {
      | func_main dec_parameters
      ;
      */
-    private void forwards() {
+    private void forwards(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing forwards");
         if (nextToken == Token.FUNCTION) {
 
             nextToken = getNextLexeme().getToken();
 
-            funcMain();
-            parameters();
-            forwardList();
+            funcMain(sclTreeNode);
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
+            parameters(sclTreeNodeChild);
+            forwardList(sclTreeNode); // TODO: Fix this.
         }
 
         System.out.println("Finished parsing forwards");
@@ -198,11 +207,11 @@ public class SCLParser extends SCLScanner {
      | MAIN {dec_main();}
      ;
      */
-    private void funcMain() {
+    private void funcMain(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing func_main");
 
-        nextToken = getNextLexeme().getToken();
+//        nextToken = getNextLexeme().getToken();
 
         if (nextToken == Token.FUNCTION_IDENTIFIER) {
             nextToken = getNextLexeme().getToken();
@@ -218,13 +227,41 @@ public class SCLParser extends SCLScanner {
     }
 
     /**
+     * Creates sub tree of main function
+     *
+     * @param sclTreeNode - the parent node of the main function
+     */
+    private void parseMainFunction(SCLTreeNode sclTreeNode) {
+
+        nextToken = getNextLexeme().getToken(); // skip over IS reserved word
+
+        /*
+        There was no real grammar provided for the main function so this will be parsed accordingly
+        to the scl file provided for now. TODO: Implement better parsing method.
+         */
+
+        if (nextToken == Token.VARIABLES) {
+//            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+//            sclTreeNode.addChild(sclTreeNodeChild);
+            varDec(sclTreeNode);
+        }
+
+        if (nextToken == Token.BEGIN) {
+//            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+//            sclTreeNode.addChild(sclTreeNodeChild);
+            fBody(sclTreeNode);
+        }
+
+    }
+
+    /**
      * oper_type : RETURN TYPE chk_ptr chk_array ret_type
      ;
      */
     private void operType() {
         System.out.println("Parsing oper_type");
 
-        nextToken = getNextLexeme().getToken();
+//        nextToken = getNextLexeme().getToken();
 
         if (nextToken != Token.RETURN) {
             System.out.println("Error at line: " + lineIndex);
@@ -326,7 +363,7 @@ public class SCLParser extends SCLScanner {
      | STRUCTYPE IDENTIFIER
      ;
      */
-    private void retType() {
+    private void retType(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing ret_type");
 
@@ -338,6 +375,9 @@ public class SCLParser extends SCLScanner {
             if (nextToken != Token.INTEGER && nextToken != Token.FLOAT &&
                     nextToken != Token.STRING &&  nextToken != Token.BOOLEAN) {
                 System.out.println("Error at line: " + lineIndex);
+            } else {
+                sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
+                nextToken = getNextLexeme().getToken();
             }
         } else if (nextToken == Token.STRUCT) {
             System.out.println("Make Scanner pick up Struct identifiers and structype identifiers");
@@ -363,7 +403,7 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         }
 
-        nextToken = getNextLexeme().getToken();
+//        nextToken = getNextLexeme().getToken();
 
         System.out.println("Finished Parsing type_name");
     }
@@ -420,7 +460,7 @@ public class SCLParser extends SCLScanner {
      | GLOBAL declarations
      ;
      */
-    private void globals() {
+    private void globals(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing globals");
 
@@ -428,7 +468,7 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         } else {
             nextToken = getNextLexeme().getToken();
-            declarations();
+            declarations(sclTreeNode);
         }
 
         System.out.println("Finished Parsing globals");
@@ -440,16 +480,18 @@ public class SCLParser extends SCLScanner {
      | DECLARATIONS const_dec var_dec
      ;
      */
-    private void declarations() {
+    private void declarations(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing declarations");
 
         if (nextToken != Token.DECLARATIONS) {
             System.out.println("Error at line: " + lineIndex);
         } else {
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
             nextToken = getNextLexeme().getToken();
-            constDec();
-            varDec();
+            constDec(sclTreeNodeChild);
+            varDec(sclTreeNodeChild);
         }
 
         System.out.println("Finished Parsing declarations");
@@ -459,15 +501,17 @@ public class SCLParser extends SCLScanner {
     /**
      * const_dec : CONSTANTS const_list
      */
-    private void constDec() {
+    private void constDec(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing const_dec");
 
         if (nextToken != Token.CONSTANTS) {
             System.out.println("Error at line: " + lineIndex);
         } else {
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
             nextToken = getNextLexeme().getToken();
-            constList();
+            constList(sclTreeNodeChild);
         }
 
         System.out.println("Finished Parsing const_dec");
@@ -478,7 +522,7 @@ public class SCLParser extends SCLScanner {
      * const_list : const_list DEFINE identifier equal_op constant_val TYPE DATA_TYPE
      ;
      */
-    private void constList() {
+    private void constList(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing const_list");
 
@@ -520,10 +564,12 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         }
 
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
+
         nextToken = getNextLexeme().getToken();
 
         if (nextToken == Token.DEFINE) {
-            constList();
+            constList(sclTreeNode);
         }
 
         System.out.println("Finished Parsing const_list");
@@ -533,15 +579,17 @@ public class SCLParser extends SCLScanner {
      * var_dec : VARIABLES var_list
      ;
      */
-    private void varDec() {
+    private void varDec(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing var_dec");
 
         if (nextToken != Token.VARIABLES) {
             System.out.println("Error at line: " + lineIndex);
         } else {
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
             nextToken = getNextLexeme().getToken();
-            varList();
+            varList(sclTreeNodeChild);
         }
 
         System.out.println("Finished Parsing var_dec");
@@ -552,7 +600,7 @@ public class SCLParser extends SCLScanner {
      * var_list : var_list DEFINE identifier rec_type
      ;
      */
-    private void varList() {
+    private void varList(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing var_list");
 
@@ -580,10 +628,10 @@ public class SCLParser extends SCLScanner {
             nextToken = getNextLexeme().getToken();
         }
 
-        retType(); // TODO: double check this
+        retType(sclTreeNode); // TODO: double check this
 
         if (nextToken == Token.DEFINE) {
-            varList();
+            varList(sclTreeNode);
         }
 
         System.out.println("Finished Parsing var_list");
@@ -593,15 +641,17 @@ public class SCLParser extends SCLScanner {
      * implement : IMPLEMENTATIONS funct_list
      ;
      */
-    private void implement() {
+    private void implement(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing implement");
 
         if (nextToken != Token.IMPLEMENTATIONS) {
             System.out.println("Error at line: " + lineIndex);
         } else {
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
             nextToken = getNextLexeme().getToken();
-            functList();
+            functList(sclTreeNodeChild);
         }
 
         System.out.println("Finished Parsing implement");
@@ -613,15 +663,27 @@ public class SCLParser extends SCLScanner {
      | funct_list funct_def
      ;
      */
-    private void functList() {
+    private void functList(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing funct_list");
 
-        functDef();
+        if (nextToken == Token.FUNCTION) {
+            nextToken = getNextLexeme().getToken();
+            nextToken = getNextLexeme().getToken(); // TODO: Fix this in scanner to get to main method
+            if (nextToken == Token.MAIN) {
+                SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+                sclTreeNode.addChild(sclTreeNodeChild);
+                parseMainFunction(sclTreeNodeChild);
+            } else {
+                functDef(sclTreeNode);
+            }
+        }
 
         if (nextToken == Token.FUNCTION) {
-            functList();
+            functList(sclTreeNode);
         }
+
+
 
         System.out.println("Finished Parsing funct_list");
 
@@ -630,11 +692,11 @@ public class SCLParser extends SCLScanner {
     /**
      * funct_def : funct_body
      */
-    private void functDef() {
+    private void functDef(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing funct_def");
 
-        functBody();
+        functBody(sclTreeNode);
 
         System.out.println("Finished Parsing funct_def");
 
@@ -644,16 +706,19 @@ public class SCLParser extends SCLScanner {
      * funct_body: FUNCTION main_head parameters f_body
      ;
      */
-    private void functBody() {
+    private void functBody(SCLTreeNode sclTreeNode) {
         System.out.println("Parsing funct_body");
 
         if (nextToken != Token.FUNCTION) {
             System.out.println("Error at line: " + lineIndex);
         } else {
             nextToken = getNextLexeme().getToken();
-            parameters();
+            funcMain(sclTreeNode); // TODO: double check this.
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
+            parameters(sclTreeNodeChild);
             mainHead();
-            fBody();
+            // fBody(); TODO : Fix this
         }
 
         System.out.println("Finished Parsing funct_body");
@@ -684,7 +749,7 @@ public class SCLParser extends SCLScanner {
      | PARAMETERS param_list
      ;
      */
-    private void parameters() {
+    private void parameters(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing parameters");
 
@@ -693,8 +758,10 @@ public class SCLParser extends SCLScanner {
         if (nextToken != Token.PARAMETERS) {
             System.out.println("Error at line: " + lineIndex);
         } else {
+            SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+            sclTreeNode.addChild(sclTreeNodeChild);
             nextToken = getNextLexeme().getToken();
-            paramList();
+            paramList(sclTreeNodeChild);
         }
 
         System.out.println("Finished Parsing parameters");
@@ -705,10 +772,10 @@ public class SCLParser extends SCLScanner {
      | param_list COMMA param_def
      ;
      */
-    private void paramList() {
+    private void paramList(SCLTreeNode sclTreeNode) {
         System.out.println("Parsing param_list");
 
-        paramDef();
+        paramDef(sclTreeNode);
 
         System.out.println("Finished Parsing param_list");
     }
@@ -717,21 +784,38 @@ public class SCLParser extends SCLScanner {
      * param_def : identifier chk_const chk_ptr chk_array TYPE type_name
      ;
      */
-    private void paramDef() {
+    private void paramDef(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing param_def");
 
+        Lexeme nextLexeme = new Lexeme(Token.NOT_DEFINED, "");
+
         if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
-                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER
+                && nextToken != Token.ARRAY_INTEGER_IDENTIFIER) {
             System.out.println("Error at line " + lineIndex);
         } else {
             nextToken = getNextLexeme().getToken();
-            if (nextToken != Token.TYPE) {
-                // TODO: finish this.
-            } else {
+
+            if (nextToken == Token.ARRAY) {
                 nextToken = getNextLexeme().getToken();
+            }
+
+            if (nextToken != Token.TYPE) {
+                System.out.println("Error at line: " + (lineIndex + 1));
+            } else {
+                nextLexeme = getNextLexeme();
+                nextToken = nextLexeme.getToken();
                 typeName();
             }
+        }
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
+
+        // if there are more params
+        if (nextLexeme.getLexeme().charAt(nextLexeme.getLexeme().length() - 1) == ',') {
+            nextToken = getNextLexeme().getToken();
+            // add more params to sclTreeNode
+            paramDef(sclTreeNode);
         }
 
         System.out.println("Finished Parsing param_def");
@@ -760,7 +844,7 @@ public class SCLParser extends SCLScanner {
      * f_body : BEGIN <statement_list> ENDFUN
      ;
      */
-    private void fBody() {
+    private void fBody(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing f_body");
 
@@ -768,11 +852,17 @@ public class SCLParser extends SCLScanner {
             System.out.println("Error at line: " + lineIndex);
         }
 
-        statementList();
+        SCLTreeNode sclTreeNodeChild = new SCLTreeNode(sclSourceLines.get(lineIndex));
+        sclTreeNode.addChild(sclTreeNodeChild);
 
-        if (nextToken != Token.END_FUN) {
-            System.out.println("Error at line: " + lineIndex);
+        // while there is no end fun keep parsing
+        while (nextToken != Token.END_FUN) {
+            statementList(sclTreeNodeChild);
         }
+
+//        if (nextToken != Token.END_FUN) {
+//            System.out.println("Error at line: " + lineIndex);
+//        }
 
         System.out.println("Finished Parsing f_body");
 
@@ -783,10 +873,10 @@ public class SCLParser extends SCLScanner {
      | statement_list statement
      ;
      */
-    private void statementList() {
+    private void statementList(SCLTreeNode sclTreeNode) {
         System.out.println("Parsing statement_list");
 
-        statement();
+        statement(sclTreeNode);
 
         System.out.println("Finished Parsing statement_list");
 
@@ -800,9 +890,15 @@ public class SCLParser extends SCLScanner {
      | repeat_statement
      ;
      */
-    private void statement() {
+    private void statement(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing statement");
+
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken == Token.INPUT) {
+            inputStatement(sclTreeNode);
+        }
 
         if (nextToken == Token.IF) {
             nextToken = getNextLexeme().getToken();
@@ -811,7 +907,7 @@ public class SCLParser extends SCLScanner {
 
         if (nextToken == Token.SET) {
             nextToken = getNextLexeme().getToken();
-            assignmentStatement();
+            assignmentStatement(sclTreeNode);
         }
 
         if (nextToken == Token.WHILE) {
@@ -821,7 +917,8 @@ public class SCLParser extends SCLScanner {
 
         if (nextToken == Token.DISPLAY) {
             nextToken = getNextLexeme().getToken();
-            printStatement();
+            // printStatement();
+            displayStatement(sclTreeNode); // Changing to this for now
         }
 
         if (nextToken == Token.REPEAT) {
@@ -830,6 +927,67 @@ public class SCLParser extends SCLScanner {
         }
 
         System.out.println("Finished Parsing statement");
+
+    }
+
+    private void inputStatement(SCLTreeNode sclTreeNode) {
+
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken != Token.STRING_LITERAL) {
+            System.out.println("Error on line: " + lineIndex);
+            System.out.println("No Prompt for input");
+        }
+
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.ARRAY_INTEGER_IDENTIFIER
+                && nextToken != Token.IDENTIFIER) {
+            System.out.println("Error on line: " + lineIndex);
+            System.out.println("No argument to store input");
+        }
+
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(lineIndex)));
+
+        nextToken = getNextLexeme().getToken();
+
+    }
+
+    private void displayStatement(SCLTreeNode sclTreeNode) {
+        nextToken = getNextLexeme().getToken();
+
+//        if (nextToken != Token.STRING_LITERAL) {
+//            System.out.println("Error on line: " + lineIndex);
+//            System.out.println("No Prompt for input");
+//        }
+//
+//        nextToken = getNextLexeme().getToken();
+//
+//        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.ARRAY_INTEGER_IDENTIFIER
+//                && nextToken != Token.IDENTIFIER) {
+//            System.out.println("Error on line: " + lineIndex);
+//            System.out.println("No argument to store input");
+//        }
+
+        int tempLineIndex = lineIndex;
+
+        while (tempLineIndex == lineIndex) { // while the line hasn't changed
+            switch (nextToken) {
+                case STRING_LITERAL: nextToken = getNextLexeme().getToken(); break;
+                case IDENTIFIER: nextToken = getNextLexeme().getToken(); break;
+                default:
+                    System.out.println("Error at line: " + lineIndex);
+                    System.out.println("Invalid Display statement");
+            }
+        }
+
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(tempLineIndex)));
+
+        nextToken = getNextLexeme().getToken();
+    }
+
+
+    private void forStatement(SCLTreeNode sclTreeNode) {
 
     }
 
@@ -849,11 +1007,11 @@ public class SCLParser extends SCLScanner {
 
         nextToken = getNextLexeme().getToken();
 
-        statementList();
+        // statementList(); TODO: Double check
 
         if (nextToken == Token.ELSE) {
             nextToken = getNextLexeme().getToken();
-            statementList();
+            // statementList(); TODO: Double check
         } else if (nextToken == Token.ENDIF) {
             nextToken = getNextLexeme().getToken();
         } else {
@@ -881,7 +1039,7 @@ public class SCLParser extends SCLScanner {
 
         // TODO: Double check this.
         while (nextToken != Token.END_WHILE) {
-            statementList();
+            // statementList(); TODO: double check
         }
 
         System.out.println("Finished Parsing while_statement");
@@ -892,12 +1050,13 @@ public class SCLParser extends SCLScanner {
      * assignment_statement : SET identifier assignment_operator arithmetic_expression
      ;
      */
-    private void assignmentStatement() {
+    private void assignmentStatement(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing assignment_statement");
 
         if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
-                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER
+                && nextToken != Token.IDENTIFIER) {
             System.out.println("Error at line: " + lineIndex);
         }
 
@@ -909,7 +1068,7 @@ public class SCLParser extends SCLScanner {
 
         nextToken = getNextLexeme().getToken();
 
-        arithmeticExp();
+        arithmeticExp(sclTreeNode);
 
         System.out.println("Finished Parsing assignment_statement");
     }
@@ -931,7 +1090,7 @@ public class SCLParser extends SCLScanner {
 
         // TODO: Double check this.
         while (nextToken != Token.END_REPEAT) {
-            statementList();
+            // statementList(); TODO: double check also might not need to parse repeat statement.
         }
 
         System.out.println("Finished Parsing repeat_statement");
@@ -1002,9 +1161,9 @@ public class SCLParser extends SCLScanner {
     private void booleanExpression() {
         System.out.println("Parsing boolean_expression");
 
-        arithmeticExp();
+        // arithmeticExp();
         relativeOp();
-        arithmeticExp();
+        // arithmeticExp();
 
         System.out.println("Finished Parsing boolean_expression");
     }
@@ -1034,11 +1193,54 @@ public class SCLParser extends SCLScanner {
      | mulexp
      ;
      */
-    private void arithmeticExp() {
+    private void arithmeticExp(SCLTreeNode sclTreeNode) {
 
         System.out.println("Parsing arithmetic_exp");
 
-        // TODO: Finish implementation, but may not be needed
+        int tempLineIndex = lineIndex; // Used to see if the lineIndex has changed
+
+        while (tempLineIndex == lineIndex) {
+            switch (nextToken) {
+                case INTEGER_LITERAL: nextToken = getNextLexeme().getToken(); break;
+                case IDENTIFIER: nextToken = getNextLexeme().getToken(); break;
+                case MUL_OPERATOR: nextToken = getNextLexeme().getToken(); break;
+                case DIV_OPERATOR: nextToken = getNextLexeme().getToken(); break;
+                case ADD_OPERATOR: nextToken = getNextLexeme().getToken(); break;
+                case SUB_OPERATOR: nextToken = getNextLexeme().getToken(); break;
+                default:
+                    System.out.println("Error at line: " + lineIndex);
+                    System.out.println("Invalid arithmetic expression");
+                    nextToken = getNextLexeme().getToken();
+            }
+
+        }
+
+        sclTreeNode.addChild(new SCLTreeNode(sclSourceLines.get(tempLineIndex)));
+
+//        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
+//                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+//            System.out.println("Error at line: " + lineIndex);
+//        }
+//
+//        if (nextToken != Token.CONSTANT_INTEGER_IDENTIFIER && nextToken != Token.CONSTANT_FLOAT_IDENTIFIER
+//                && nextToken != Token.CONSTANT_STRING_IDENTIFIER && nextToken != Token.CONSTANT_BOOLEAN_IDENTIFIER) {
+//            System.out.println("Error at line: " + lineIndex);
+//        }
+//
+//        if (nextToken != Token.INTEGER_LITERAL && nextToken != Token.FLOAT_LITERAL
+//                && nextToken != Token.STRING_LITERAL) {
+//            System.out.println("Error at line: " + lineIndex);
+//        }
+//
+//        nextToken = getNextLexeme().getToken();
+//
+//        if (nextToken != Token.ADD_OPERATOR && nextToken != Token.SUB_OPERATOR) {
+//            System.out.println("Error at line: " + lineIndex);
+//        }
+//
+//        nextToken = getNextLexeme().getToken();
+
+//        mulExp();
 
         System.out.println("Finished Parsing arithmetic_exp");
 
@@ -1050,11 +1252,34 @@ public class SCLParser extends SCLScanner {
      | primary
      ;
      */
-    private void mulexp() {
+    private void mulExp() {
 
         System.out.println("Parsing mulexp");
 
-        // TODO: Finish implementation, but may not be needed
+        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
+                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.CONSTANT_INTEGER_IDENTIFIER && nextToken != Token.CONSTANT_FLOAT_IDENTIFIER
+                && nextToken != Token.CONSTANT_STRING_IDENTIFIER && nextToken != Token.CONSTANT_BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.INTEGER_LITERAL && nextToken != Token.FLOAT_LITERAL
+                && nextToken != Token.STRING_LITERAL) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        nextToken = getNextLexeme().getToken();
+
+        if (nextToken != Token.MUL_OPERATOR && nextToken != Token.DIV_OPERATOR) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        nextToken = getNextLexeme().getToken();
+
+        primary();
 
         System.out.println("Finished Parsing mulexp");
 
@@ -1070,7 +1295,22 @@ public class SCLParser extends SCLScanner {
     private void primary() {
         System.out.println("Parsing primary");
 
-        // TODO: Finish implementation, but may not be needed
+        if (nextToken != Token.INTEGER_IDENTIFIER && nextToken != Token.FLOAT_IDENTIFIER
+                && nextToken != Token.STRING_IDENTIFIER && nextToken != Token.BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.CONSTANT_INTEGER_IDENTIFIER && nextToken != Token.CONSTANT_FLOAT_IDENTIFIER
+                && nextToken != Token.CONSTANT_STRING_IDENTIFIER && nextToken != Token.CONSTANT_BOOLEAN_IDENTIFIER) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        if (nextToken != Token.INTEGER_LITERAL && nextToken != Token.FLOAT_LITERAL
+                && nextToken != Token.STRING_LITERAL) {
+            System.out.println("Error at line: " + lineIndex);
+        }
+
+        nextToken = getNextLexeme().getToken();
 
         System.out.println("Finished Parsing primary");
 

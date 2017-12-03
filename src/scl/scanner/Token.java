@@ -19,7 +19,7 @@ public enum Token {
 
     INTEGER_LITERAL("\\d+", 6),
 
-    FLOAT_LITERAL("", 7),
+    FLOAT_LITERAL("^[-+]?\\d+(\\.\\d+)?$", 7),
 
     STRING_LITERAL("\".*\"", 8),
 
@@ -63,6 +63,8 @@ public enum Token {
     SYMBOL_IDENTIFIER("", 25),
 
     FUNCTION_IDENTIFIER("", 26),
+
+    IDENTIFIER("", 27),
 
     LB("\\[", 27),
 
