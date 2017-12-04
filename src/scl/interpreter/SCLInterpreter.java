@@ -3,21 +3,28 @@ package scl.interpreter;
 import scl.parser.SCLParser;
 import scl.parser.SCLTree;
 import scl.parser.SCLTreeNode;
+import scl.scanner.Lexeme;
+import scl.scanner.Token;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Created by James on 11/26/2017.
  */
 public class SCLInterpreter extends SCLParser {
 
-    private HashMap<String, Object> globalVariables; // Used for storing the global variables within the program
+    private HashMap<String, Object> variables; // Used for storing the variables within the program
+    private HashMap<String, Object> localVariables; // Used for storing the local variables within the program
+
+    private Scanner input;
 
     public SCLInterpreter(File sclProgram) throws FileNotFoundException {
         super(sclProgram);
-        globalVariables = new HashMap<>();
+        variables = new HashMap<>();
+        localVariables = new HashMap<>();
+        input = new Scanner(System.in);
     }
 
     public void interpret() {
@@ -33,10 +40,106 @@ public class SCLInterpreter extends SCLParser {
 
     }
 
-    private void interpret(SCLTreeNode sclTreeNode, SCLTreeNode parent) {
+    private void interpret(SCLTreeNode sclTreeNode) {
+
+        List<Lexeme> lexemes = sclTreeNode.getSclSourceLine().getLexemes();
+
+        if (lexemes.get(0).getToken() == Token.DEFINE) {
+            variables.put(lexemes.get(1).getLexeme(), null);
+
+            if (lexemes.get(2).getToken() == Token.ASSIGNMENT_OPERATOR) {
+                variables.put(lexemes.get(1).getLexeme(), lexemes.get(3).getLexeme());
+            }
+        }
+
+        if (lexemes.get(0).getToken() == Token.INPUT) {
+            interpretInputStatement(lexemes);
+        }
+
+        if (lexemes.get(0).getToken() == Token.SET) {
+            interpretAssignmentStatement(lexemes);
+        }
+
+        if (lexemes.get(0).getToken() == Token.DISPLAY) {
+            interpretDisplayStatement(lexemes);
+        }
+
+        for (SCLTreeNode node : sclTreeNode.getChildren()) {
+            interpret(node);
+        }
 
     }
 
+    private void interpretInputStatement(List<Lexeme> lexemes) {
+
+        System.out.println(lexemes.get(1).getLexeme()); // Print user prompt
+
+        String userInput = input.nextLine(); // Grab user input
+
+        variables.put(lexemes.get(2).getLexeme(), userInput);
+
+    }
+
+    private void interpretDisplayStatement(List<Lexeme> lexemes) {
+        System.out.println(lexemes.get(1).getLexeme());
+        System.out.println(variables.get(lexemes.get(2).getLexeme()));
+    }
+
+    private void interpretAssignmentStatement(List<Lexeme> lexemes) {
+        String arithmeticExpression = "";
+
+        for (int i = 3; i < lexemes.size(); i++) {
+            arithmeticExpression += lexemes.get(i).getLexeme() + " ";
+        }
+
+        variables.put(lexemes.get(1).getLexeme(), infixToPostfixEval(arithmeticExpression));
+    }
+
+    private float infixToPostfixEval(String arithmeticExpression) {
+
+        /* Convert infix to postfix */
+
+        HashMap<String, Integer> prec = new HashMap<>();
+        prec.put("*", 3);
+        prec.put("/", 3);
+        prec.put("+", 2);
+        prec.put("-", 2);
+
+        List<String> postFixList = new ArrayList<>();
+        Stack<String> opStack = new Stack<>();
+        String[] parts = arithmeticExpression.split(" ");
+
+        for (String part : parts) {
+            if (part.matches("^[a-zA-Z0-9_.-]*$")) {
+                postFixList.add(part);
+            } else {
+                while(!opStack.empty() && prec.get(opStack.peek()) >= prec.get(part)) {
+                    postFixList.add(opStack.pop());
+                }
+                opStack.push(part);
+            }
+        }
+
+        while (!opStack.empty()) {
+            postFixList.add(opStack.pop());
+        }
+
+        /* Evaluate the post fix expression */
+        Stack<String> stack = new Stack<>();
+
+        for (String component : postFixList) {
+            switch (component) {
+                case "*":
+                    break;
+                case "/": break;
+                case "+": break;
+                case "-": break;
+                default: stack.push(component);
+            }
+        }
+
+        return (float) 0.0;
+    }
 
     /**
      * Builds a String starting from root node
