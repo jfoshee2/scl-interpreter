@@ -32,12 +32,7 @@ public class SCLInterpreter extends SCLParser {
 
         SCLTreeNode rootNode = parseTree.getRoot();
 
-
-        System.out.println(displayMyTree(parseTree.getRoot(), 0));
-
-        System.out.println("Debugging");
-
-
+        rootNode.getChildren().forEach(this::interpret);
     }
 
     private void interpret(SCLTreeNode sclTreeNode) {
@@ -86,13 +81,152 @@ public class SCLInterpreter extends SCLParser {
     }
 
     private void interpretAssignmentStatement(List<Lexeme> lexemes) {
-        String arithmeticExpression = "";
 
-        for (int i = 3; i < lexemes.size(); i++) {
-            arithmeticExpression += lexemes.get(i).getLexeme() + " ";
+        List<Lexeme> arithmeticExpressionLexemes = new ArrayList<>(lexemes.subList(3, lexemes.size()));
+
+        variables.put(lexemes.get(1).getLexeme(), evaluate(arithmeticExpressionLexemes));
+    }
+
+    private float evaluate(List<Lexeme> lexemes) {
+
+        /* Convert infix to postfix */
+
+        HashMap<String, Integer> prec = new HashMap<>();
+        prec.put("*", 3);
+        prec.put("/", 3);
+        prec.put("+", 2);
+        prec.put("-", 2);
+
+        List<Lexeme> postFixList = new ArrayList<>();
+        Stack<String> opStack = new Stack<>();
+
+        for (Lexeme lexeme : lexemes) {
+            if (lexeme.getLexeme().matches("^[a-zA-Z0-9_.-]*$")) {
+                postFixList.add(lexeme);
+            } else {
+                while (!opStack.empty() && prec.get(opStack.peek()) >= prec.get(lexeme.getLexeme())) {
+                    postFixList.add(new Lexeme(Token.getToken(opStack.peek()), opStack.pop()));
+                }
+                opStack.push(lexeme.getLexeme());
+            }
         }
 
-        variables.put(lexemes.get(1).getLexeme(), infixToPostfixEval(arithmeticExpression));
+        while (!opStack.empty()) {
+            postFixList.add(new Lexeme(Token.getToken(opStack.peek()), opStack.pop()));
+        }
+
+        /* Evaluate the postfix expression */
+        Stack<String> stack = new Stack<>();
+
+        for (Lexeme component : postFixList) {
+            switch (component.getToken()) {
+                case MUL_OPERATOR: performMulOperation(stack); break;
+                case DIV_OPERATOR: performDivOperator(stack); break;
+                case ADD_OPERATOR: performAddOperator(stack); break;
+                case SUB_OPERATOR: performSubOperator(stack); break;
+                default: stack.push(component.getLexeme());
+            }
+        }
+
+        return Float.parseFloat(stack.pop()); // There should be only one element in stack and that should be a float
+    }
+
+    private void performMulOperation(Stack<String> stack) {
+        String first = stack.pop();
+        String second = stack.pop();
+
+        float firstValue;
+        if (Token.getToken(first) == Token.INTEGER_LITERAL) {
+            firstValue = (float) Integer.parseInt(first);
+        } else if (Token.getToken(first) == Token.FLOAT_LITERAL) {
+            firstValue = Float.parseFloat(first);
+        } else {
+            firstValue = Float.parseFloat(String.valueOf(variables.get(first)));
+        }
+
+        float secondValue;
+        if (Token.getToken(second) == Token.INTEGER_LITERAL) {
+            secondValue = (float) Integer.parseInt(second);
+        } else if (Token.getToken(second) == Token.FLOAT_LITERAL) {
+            secondValue = Float.parseFloat(second);
+        } else {
+            secondValue = Float.parseFloat(String.valueOf(variables.get(second)));
+        }
+
+        float result = firstValue * secondValue;
+
+        stack.push(result + "");
+    }
+
+    private void performDivOperator(Stack<String> stack) {
+        String first = stack.pop();
+        String second = stack.pop();
+
+        float firstValue;
+        if (Token.getToken(first) == Token.INTEGER_LITERAL) {
+            firstValue = (float) Integer.parseInt(first);
+        } else {
+            firstValue = (float) variables.get(first);
+        }
+
+        float secondValue;
+        if (Token.getToken(second) == Token.INTEGER_LITERAL) {
+            secondValue = (float) Integer.parseInt(second);
+        } else {
+            secondValue = (float) Integer.parseInt(String.valueOf(variables.get(second)));
+        }
+
+        float result = secondValue / firstValue;
+
+        stack.push(result + "");
+    }
+
+    private void performAddOperator(Stack<String> stack) {
+        String first = stack.pop();
+        String second = stack.pop();
+
+        float firstValue;
+        if (Token.getToken(first) == Token.INTEGER_LITERAL) {
+            firstValue = (float) Integer.parseInt(first);
+        } else {
+            firstValue = (float) variables.get(first);
+        }
+
+        float secondValue;
+        if (Token.getToken(second) == Token.INTEGER_LITERAL) {
+            secondValue = (float) Integer.parseInt(second);
+        } else {
+            secondValue = (float) variables.get(second);
+        }
+
+        float result = firstValue + secondValue;
+
+        stack.push(result + "");
+
+    }
+
+    private void performSubOperator(Stack<String> stack) {
+        String first = stack.pop();
+        String second = stack.pop();
+
+        float firstValue;
+        if (Token.getToken(first) == Token.INTEGER_LITERAL) {
+            firstValue = (float) Integer.parseInt(first);
+        } else {
+            firstValue = (float) variables.get(first);
+        }
+
+        float secondValue;
+        if (Token.getToken(second) == Token.INTEGER_LITERAL) {
+            secondValue = (float) Integer.parseInt(second);
+        } else {
+            secondValue = (float) variables.get(second);
+        }
+
+        float result = secondValue - firstValue;
+
+        stack.push(result + "");
+
     }
 
     private float infixToPostfixEval(String arithmeticExpression) {
